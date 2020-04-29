@@ -1,5 +1,5 @@
 <template>
-  <v-stage @click="handleClick" ref="stage" :config="configStage">
+  <v-stage  ref="stage" :config="configStage">
     <v-layer  ref="layer">
         <v-text :config="configText" />
         <v-image @mousedown="handleDown" @mousemove="handleMove" @mouseup="handleUp" ref="image" :config="configImage" />
@@ -43,8 +43,20 @@ export default {
       },
       isPaint: false,
       lastPointerPosition: null,
-      context: null
+      context: null,
+      prevImg: null
     }
+   },
+   updated() {
+       //plaatsen van een vorige tekening op de canvas
+    this.prevImg = new Image();
+    this.prevImg.addEventListener('load', function() {
+            var theimg = this.$refs.image.getNode();        
+            this.context = theimg.getContext('2d');
+            this.context.drawImage(this.prevImg,0,0,width, height);
+    }, false);
+    this.prevImg.src= "https://www.pngfind.com/pngs/m/111-1112775_instagram-heart-png-transparent-images-tekening-gezin-met.png";
+
    },
     methods: {
         handleDown: function() {
@@ -59,6 +71,7 @@ export default {
                 return;
 
             var theimg = this.$refs.image.getNode();
+            
             this.context = theimg.getContext('2d');
             this.context.strokeStyle = '#df4b26';
             this.context.lineJoin = 'round';
