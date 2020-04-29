@@ -1,11 +1,12 @@
 <template>
   <div id="app">
       <aside>
-        <input type="text" name="username">
-        <button>Opslaan</button>
+        <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
+        <button v-on:click="startDrawing">Start</button>
       </aside>
-
-    <DrawArt />
+    <div id="painting" v-if="this.doStart">
+      <DrawArt  :username="username" />
+    </div>
   </div>
 </template>
 
@@ -17,7 +18,22 @@ export default {
   name: 'App',
   components: {
     DrawArt
-  }
+  },
+  data() {
+    return {
+    username: '',
+    doStart: false
+    }
+  },
+  methods: {
+        startDrawing() {
+          if (this.username.length > 2)
+            this.doStart = true;
+          else 
+             this.username = "?";
+        }
+}
+
 }
 </script>
 
@@ -33,5 +49,9 @@ export default {
 aside {
   width: 9%;
   float: left;
+}
+#painting {
+  margin-left: 12%;
+  border: 1px solid grey;
 }
 </style>

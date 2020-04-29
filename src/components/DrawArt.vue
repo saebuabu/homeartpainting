@@ -1,20 +1,35 @@
 <template>
   <v-stage @click="handleClick" ref="stage" :config="configStage">
     <v-layer  ref="layer">
+        <v-text :config="configText" />
         <v-image @mousedown="handleDown" @mousemove="handleMove" @mouseup="handleUp" ref="image" :config="configImage" />
     </v-layer>
   </v-stage>
 </template>
 <script>
-const width = window.innerWidth - (window.innerWidth/10);
-const height = window.innerHeight;
+const width = window.innerWidth - (window.innerWidth/16);
+const height = window.innerHeight - (window.innerHeight/10);
 
 export default {
   name: 'DrawArt',
   props: {
+      username: {
+          type: String,
+          default() {
+              return ''
+          }
+      }
   },
    data() {
     return {
+        configText: {
+            x: 0,
+            y: 0,
+            text: "Start with drawing "+ this.username,
+            fontSize: 23,
+            fontFamily: 'Calibri',
+            fill: 'green'
+        },
       configStage: {
         width: width,
         height: height      
