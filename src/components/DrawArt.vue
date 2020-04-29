@@ -35,7 +35,7 @@ export default {
         height: height      
       },
       configImage: {
-           image: document.createElement('canvas'),
+          image: document.createElement('canvas'),
            width: width,
            height: height,
            x: 0,
@@ -44,24 +44,32 @@ export default {
       isPaint: false,
       lastPointerPosition: null,
       context: null,
-      prevImg: null
+      prevImageDrewn: false,
+      image: null
     }
    },
-   updated() {
-       //plaatsen van een vorige tekening op de canvas
-    this.prevImg = new Image();
-    this.prevImg.addEventListener('load', function() {
-            var theimg = this.$refs.image.getNode();        
-            this.context = theimg.getContext('2d');
-            this.context.drawImage(this.prevImg,0,0,width, height);
-    }, false);
-    this.prevImg.src= "https://www.pngfind.com/pngs/m/111-1112775_instagram-heart-png-transparent-images-tekening-gezin-met.png";
+   created() {
+       const image = new window.Image();
+       image.src = "https://www.pngfind.com/pngs/m/111-1112775_instagram-heart-png-transparent-images-tekening-gezin-met.png";
 
+       image.onload = () => {
+           console.log(image);
+           this.image = image;
+       }
    },
+   updated() {
+ 
+ },
     methods: {
         handleDown: function() {
             this.isPaint = true;
-            this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition();
+            this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
+            if (!this.prevImageDrewn) {
+                var theimg = this.$refs.image.getNode();        
+                this.context = theimg.getContext('2d');
+                this.context.drawImage(this.image,0,0,width, height);
+                this.prevImageDrewn = true;
+            }
         },
         handleUp: function() {
             this.isPaint = false;
@@ -73,6 +81,8 @@ export default {
             var theimg = this.$refs.image.getNode();
             
             this.context = theimg.getContext('2d');
+            this.context.globalAlpha = 0.8;
+            //this.context.globalCompositeOperation = "xor";
             this.context.strokeStyle = '#df4b26';
             this.context.lineJoin = 'round';
             this.context.lineWidth = 5;
