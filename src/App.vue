@@ -1,17 +1,22 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+      <aside>
+        <input type="text" name="username">
+        <button>Opslaan</button>
+      </aside>
+
+    <DrawArt />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+//import Artpainting from './components/Artpainting.vue'
+import DrawArt from './components/DrawArt.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    DrawArt
   }
 }
 </script>
@@ -24,5 +29,9 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+aside {
+  width: 9%;
+  float: left;
 }
 </style>
