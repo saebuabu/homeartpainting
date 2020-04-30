@@ -2,7 +2,10 @@
   <div id="app">
       <aside>
         <div v-if="this.fase == 'beforeStart'">
+          <label>Wat is je naam?: </label>
           <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
+          <label>Kies een kleur:</label>
+          <Colorpicker />
           <button v-on:click="startDrawing">Start</button>
         </div>
         <div v-if="this.fase == 'paintingEnded'">
@@ -19,11 +22,13 @@
 <script>
 //import Artpainting from './components/Artpainting.vue'
 import DrawArt from './components/DrawArt.vue'
+import Colorpicker from './components/Colorpicker.vue'
 
 export default {
   name: 'App',
   components: {
-    DrawArt
+    DrawArt,
+    Colorpicker
   },
   data() {
     return {
@@ -62,8 +67,19 @@ aside {
   margin-left: 12%;
   border: 1px solid grey;
 }
-button, input {
+aside button, aside input {
   display: block;
   margin: 0.3em;
+  padding: 0.2em;
+  border: 1px solid grey;
 }
+aside button {
+  background-color:lightskyblue; 
+}
+
+aside label {
+  text-align: left;
+  padding: 0.1em;
+}
+
 </style>
