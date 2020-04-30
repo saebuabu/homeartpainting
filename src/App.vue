@@ -1,11 +1,17 @@
 <template>
   <div id="app">
       <aside>
-        <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
-        <button v-on:click="startDrawing">Start</button>
+        <div v-if="this.fase == 'beforeStart'">
+          <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
+          <button v-on:click="startDrawing">Start</button>
+        </div>
+        <div v-if="this.fase == 'paintingEnded'">
+          <button v-on:click="savePainting">Save</button>
+        </div>
       </aside>
-    <div id="painting" v-if="this.doStart">
-      <DrawArt  :username="username" />
+
+    <div id="painting" v-if="this.fase != 'beforeStart'">
+      <DrawArt  :username="username" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -22,18 +28,20 @@ export default {
   data() {
     return {
     username: '',
-    doStart: false
+    fase: 'beforeStart'    
     }
   },
   methods: {
         startDrawing() {
           if (this.username.length > 2)
-            this.doStart = true;
+            this.fase = 'paintingEnded';
           else 
              this.username = "?";
-        }
-}
-
+        },
+        savePainting() {
+          this.$refs.childComponent.savePaintingAlt();
+    }
+  }
 }
 </script>
 
@@ -53,5 +61,9 @@ aside {
 #painting {
   margin-left: 12%;
   border: 1px solid grey;
+}
+button, input {
+  display: block;
+  margin: 0.3em;
 }
 </style>
