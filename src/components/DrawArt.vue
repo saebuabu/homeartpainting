@@ -1,7 +1,6 @@
 <template>
   <v-stage  ref="stage" :config="configStage">
     <v-layer  ref="layer">
-        <v-text :config="configText" />
         <v-image @mousedown="handleDown" @mousemove="handleMove" @mouseup="handleUp" ref="image" :config="configImage" />
     </v-layer>
   </v-stage>
@@ -22,14 +21,6 @@ export default {
    },
    data() {
     return {
-        configText: {
-            x: 0,
-            y: 0,
-            text: "Start with drawing "+ this.username,
-            fontSize: 23,
-            fontFamily: 'Calibri',
-            fill: 'green'
-        },
       configStage: {
         width: width,
         height: height      
