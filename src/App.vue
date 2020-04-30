@@ -1,60 +1,69 @@
 <template>
-  <v-app>
-    <v-app-bar
-      app
-      color="primary"
-      dark
-    >
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
+  <div id="app">
+      <aside>
+        <div v-if="this.fase == 'beforeStart'">
+          <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
+          <button v-on:click="startDrawing">Start</button>
+        </div>
+        <div v-if="this.fase == 'paintingEnded'">
+          <button v-on:click="savePainting">Save</button>
+        </div>
+      </aside>
 
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar>
-
-    <v-content>
-      <HelloWorld/>
-    </v-content>
-  </v-app>
+    <div id="painting" v-if="this.fase != 'beforeStart'">
+      <DrawArt  :username="username" ref="childComponent"/>
+    </div>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld';
+//import Artpainting from './components/Artpainting.vue'
+import DrawArt from './components/DrawArt.vue'
 
 export default {
   name: 'App',
-
   components: {
-    HelloWorld,
+    DrawArt
   },
-
-  data: () => ({
-    //
-  }),
-};
+  data() {
+    return {
+    username: '',
+    fase: 'beforeStart'    
+    }
+  },
+  methods: {
+        startDrawing() {
+          if (this.username.length > 2)
+            this.fase = 'paintingEnded';
+          else 
+             this.username = "?";
+        },
+        savePainting() {
+          this.$refs.childComponent.savePaintingAlt();
+    }
+  }
+}
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+aside {
+  width: 9%;
+  float: left;
+}
+#painting {
+  margin-left: 12%;
+  border: 1px solid grey;
+}
+button, input {
+  display: block;
+  margin: 0.3em;
+}
+</style>
