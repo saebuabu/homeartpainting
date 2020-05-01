@@ -41,7 +41,7 @@ export default {
   methods: {
         colorSet(value) {
             this.colorcode = value;
-            console.log("kleur: "+value);
+            //console.log("kleur: "+value);
         },
         startDrawing() {
           if (this.username.length > 2)
