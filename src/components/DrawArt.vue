@@ -13,10 +13,13 @@ export default {
   name: 'DrawArt',
   props: {
       username: {
-          type: String,
-          default() {
-              return ''
-          }
+          type: String
+      },
+      colorcode: {
+          type: String
+      },
+      brushwidth: {
+          type: Number
       }
    },
    data() {
@@ -62,7 +65,7 @@ export default {
         
                 console.log('Save action triggered');
                 var dataURL = this.$refs.layer.getNode().toDataURL();
-                console.log(dataURL);
+                //console.log(dataURL);
                 this.downloadURI(dataURL, 'stage.png');
          /*       var dataURL = this.$refs.layer.getNode().toJSON();
                 console.log(dataURL);
@@ -70,10 +73,10 @@ export default {
         },
         savePaintingAlt: function () {
         
-                console.log('Alt Save action triggered');
+                //console.log('Alt Save action triggered');
                 var thecanvas = document.querySelector("canvas");
                 var dataURL= thecanvas.toDataURL();
-                console.log(dataURL);
+                //console.log(dataURL);
                 this.downloadURI(dataURL, 'canvas.png');
          /*       var dataURL = this.$refs.layer.getNode().toJSON();
                 console.log(dataURL);
@@ -116,9 +119,9 @@ export default {
             this.context = theimg.getContext('2d');
             this.context.globalAlpha = 0.8;
             //this.context.globalCompositeOperation = "xor";
-            this.context.strokeStyle = '#df4b26';
+            this.context.strokeStyle = this.colorcode;
             this.context.lineJoin = 'round';
-            this.context.lineWidth = 5;
+            this.context.lineWidth = this.brushwidth;
 
             this.context.beginPath();
             var localPos = {

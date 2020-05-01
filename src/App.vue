@@ -4,9 +4,10 @@
         <div v-if="this.fase == 'beforeStart'">
           <label>Wat is je naam?: </label>
           <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
-          <label>Kies een kleur:</label>
-          <Colorpicker />
+          <input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
+
           <button v-on:click="startDrawing">Start</button>
+          <Colorpicker @color-Set="colorSet" />
         </div>
         <div v-if="this.fase == 'paintingEnded'">
           <button v-on:click="savePainting">Save</button>
@@ -14,7 +15,7 @@
       </aside>
 
     <div id="painting" v-if="this.fase != 'beforeStart'">
-      <DrawArt  :username="username" ref="childComponent"/>
+      <DrawArt :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -33,10 +34,15 @@ export default {
   data() {
     return {
     username: '',
+    colorcode: '#ff0000',
     fase: 'beforeStart'    
     }
   },
   methods: {
+        colorSet(value) {
+            this.colorcode = value;
+            console.log("kleur: "+value);
+        },
         startDrawing() {
           if (this.username.length > 2)
             this.fase = 'paintingEnded';
@@ -80,6 +86,12 @@ aside button {
 aside label {
   text-align: left;
   padding: 0.1em;
+}
+
+#pickedColorEl {
+  display: inline-block;
+  width: 30px;
+  height: 1em;
 }
 
 </style>
