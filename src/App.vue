@@ -5,7 +5,10 @@
           <input type="text" v-model="username" name="username" placeholder="Naam?">
           <input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
 
-          <button v-on:click="startDrawing">Start</button>
+          <label v-if="this.fase == 'drawingSaved'" >{{ messageSaved }}</label>
+          
+          <button v-else  v-on:click="startDrawing">Start</button>
+          
           <Colorpicker @color-Set="colorSet" />
         </div>
         <div v-if="this.fase == 'paintingEnded'">
@@ -14,7 +17,7 @@
       </aside>
 
     <div id="painting" v-if="this.fase != 'beforeStart'">
-      <DrawArt :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
+      <DrawArt  @drawing-Saved="drawingSaved" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -35,7 +38,8 @@ export default {
     username: '',
     colorcode: '#ff0000',
     fase: 'beforeStart' ,
-    brushwidth: 5
+    brushwidth: 5,
+    drawingMessage: ''
     }
   },
   methods: {
@@ -48,6 +52,10 @@ export default {
             this.fase = 'paintingEnded';
           else 
              this.username = "?";
+        },
+        drawingSaved(val) {
+            this.fase = 'savedDrawing';
+            this.drawingMessage = val;
         },
         savePainting() {
           this.$refs.childComponent.savePaintingAlt();
