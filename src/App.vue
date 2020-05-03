@@ -2,8 +2,7 @@
   <div id="app">
       <aside>
         <div v-if="this.fase == 'beforeStart'">
-          <label>Wat is je naam?: </label>
-          <input type="text" v-model="username" name="username" placeholder="Wat is je naam?">
+          <input type="text" v-model="username" name="username" placeholder="Naam?">
           <input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
 
           <button v-on:click="startDrawing">Start</button>
@@ -35,7 +34,8 @@ export default {
     return {
     username: '',
     colorcode: '#ff0000',
-    fase: 'beforeStart'    
+    fase: 'beforeStart' ,
+    brushwidth: 5
     }
   },
   methods: {
@@ -63,7 +63,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 3px;
 }
 aside {
   width: 9%;

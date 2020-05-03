@@ -1,7 +1,7 @@
 <template>
   <v-stage  ref="stage" :config="configStage">
     <v-layer  ref="layer">
-        <v-image @mousedown="handleDown" @mousemove="handleMove" @mouseup="handleUp" ref="image" :config="configImage" />
+        <v-image @mousedown="handleDown" @touchstart="handleDown" @mousemove="handleMove" @touchmove="handleMove" @mouseup="handleUp" @touchend="handleUp" ref="image" :config="configImage" />
     </v-layer>
   </v-stage>
 </template>
@@ -19,7 +19,7 @@ export default {
           type: String
       },
       brushwidth: {
-          type: Number
+          type: String
       }
    },
    data() {
@@ -62,6 +62,9 @@ export default {
        image.onload = () => {
            //console.log(image);
            this.image = image;
+           var theimg = this.$refs.image.getNode();        
+           this.context = theimg.getContext('2d');
+           this.context.drawImage(this.image,0,0,width, height);
        }
     },
     methods: {
@@ -85,16 +88,15 @@ export default {
             document.body.removeChild(link);
             //delete link;
       },
+      updated() {
+      },
         handleDown: function() {
             this.isPaint = true;
             this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
             if (!this.prevImageDrewn) {
-                var theimg = this.$refs.image.getNode();        
-                this.context = theimg.getContext('2d');
-                this.context.drawImage(this.image,0,0,width, height);
-                this.prevImageDrewn = true;
 
                 this.addPointToLine(this.lastPointerPosition);
+                this.prevImageDrewn = true;
             }
         },
         addPointToLine: function(p) {
