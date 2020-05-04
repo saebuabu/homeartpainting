@@ -13,7 +13,7 @@ if (host == "localhost") {
    Vue.prototype.$mongoresturl = "http://localhost:8088/mongorestphp/";
 }
 else {
-  Vue.prototype.$mongoresturl = "https://saebu.nl/mongorest/";
+  Vue.prototype.$mongoresturl = "http://saebu.nl/mongorest/";
 }
 
 new Vue({
