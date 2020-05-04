@@ -23,6 +23,9 @@ export default {
       },
       brushwidth: {
           type: String
+      },
+      fase: {
+          type: String
       }
    },
    data() {
@@ -54,6 +57,8 @@ export default {
            De src van het achtergrond plaatje wordt uit de database opgehaald en hier getoond; de nieuwe gebruiker schildert er overheen en de nieuwe 
            versie wordt opgeslagen met de naam van de current gebruiker 
        **************************************************************/
+        this.$emit('start-Loading');
+        
         this.axios.get(this.$mongoresturl + 'artget.php')
             .then(response => {
                 //console.log(response);
@@ -65,10 +70,12 @@ export default {
                 }
                 else {
                     this.errors.push(response.response);
+                    this.$emit('stop-Loading', response.response);
+
                 }
             })
             .catch(error => {
-                this.errors.push("Server could not authenticate" + error);
+                this.errors.push("Server could not process " + error);
             });
 
         
@@ -78,7 +85,8 @@ export default {
            var theimg = this.$refs.image.getNode();        
            this.context = theimg.getContext('2d');
            this.context.drawImage(this.image,0,0,width, height);
-       }
+           this.$emit('stop-Loading');
+        }
     },
     methods: {
         savePaintingAlt: function () {
@@ -92,6 +100,9 @@ export default {
                 
                 //Test om te kijken of het nieuw getekende ook wordt meegwenomen
                 //this.downloadURI(dataURL, 'canvas.png');
+                this.$emit('drawing-Saved',"");
+                this.$emit('start-Loading');
+
                 this.axios.post(this.$mongoresturl + 'artsave.php', querystring.stringify({
                         username : this.username,
                         imagedata : dataURL
@@ -100,14 +111,16 @@ export default {
                         //console.log(response);
                         if (response.data.status == "ok") {
                             console.log(response);
-                            this.$emit('drawing-Saved',"Gesaved...");
+                            this.$emit('stop-Loading');
+
                         }
                         else {
                             this.errors.push(response.response);
+                             this.$emit('stop-Loading', response.response);
                         }
                     })
                     .catch(error => {
-                        this.errors.push("Server could not authenticate" + error);
+                        this.errors.push("Server could not process, " + error);
                     });
         },
         downloadURI: function(uri, name) {
@@ -122,12 +135,14 @@ export default {
       updated() {
       },
         handleDown: function() {
-            this.isPaint = true;
-            this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
-            if (!this.prevImageDrewn) {
+            if (this.fase == 'painting') {
+                this.isPaint = true;
+                this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
+                if (!this.prevImageDrewn) {
 
-                this.addPointToLine(this.lastPointerPosition);
-                this.prevImageDrewn = true;
+                    this.addPointToLine(this.lastPointerPosition);
+                    this.prevImageDrewn = true;
+                }
             }
         }, //wordt (nog) niet gebruikt
         addPointToLine: function(p) {
@@ -178,7 +193,6 @@ export default {
 }
 </script>
 #app div {
-    margin-left: 10%;
 }
 <style scoped>
 </style>

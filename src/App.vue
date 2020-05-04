@@ -1,23 +1,27 @@
 <template>
   <div id="app">
-      <aside>
-        <div v-if="this.fase == 'beforeStart'">
-          <input type="text" v-model="username" name="username" placeholder="Naam?">
-          <input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
-
-          <label v-if="this.fase == 'drawingSaved'" >{{ messageSaved }}</label>
-          
-          <button v-else  v-on:click="startDrawing">Start</button>
-          
+      <header><h1>Titel? </h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. 
+        Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui.
+        <br><br><a href='http://kunstpodium-t.com/project/apprenticemaster/'>Apprentice master project 2020</a>
+        </p><br>            
+      <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
+      <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
+      <span v-if="this.fase == 'painting'" ><button v-on:click="savePainting">Save</button></span>
+      </header>
+      <LoadingBar v-if="this.isLoading"/>
+      <aside v-bind:class="classObject">
+        <div v-if="this.fase == 'beforePainting'">
+          <h4>Naam: </h4><input type="text" v-model="username" name="username" placeholder="Naam?">
+          <h4>Kwastdikte: </h4><input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
+          <h4>Kleur:</h4>
           <Colorpicker @color-Set="colorSet" />
-        </div>
-        <div v-if="this.fase == 'paintingEnded'">
-          <button v-on:click="savePainting">Save</button>
         </div>
       </aside>
 
-    <div id="painting" v-if="this.fase != 'beforeStart'">
-      <DrawArt  @drawing-Saved="drawingSaved" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
+    <div id="painting" v-if="this.fase != 'beforePainting'">
+      <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -26,21 +30,33 @@
 //import Artpainting from './components/Artpainting.vue'
 import DrawArt from './components/DrawArt.vue'
 import Colorpicker from './components/Colorpicker.vue'
+import LoadingBar from "./components/LoadingBar";
+
 
 export default {
   name: 'App',
   components: {
     DrawArt,
-    Colorpicker
+    Colorpicker,
+    LoadingBar
   },
   data() {
     return {
     username: '',
     colorcode: '#ff0000',
-    fase: 'beforeStart' ,
+    fase: 'beforeStart' ,   //beforeStart, beforePainting, painting, PaintingEnded 
+    isLoading: false,
     brushwidth: 5,
     drawingMessage: ''
     }
+  },
+  computed: {
+        classObject: function() {
+            return {
+                active: this.fase == 'beforePainting',
+                'hide': this.fase != 'beforePainting'
+            }
+        }
   },
   methods: {
         colorSet(value) {
@@ -49,17 +65,28 @@ export default {
         },
         startDrawing() {
           if (this.username.length > 2)
-            this.fase = 'paintingEnded';
+            this.fase = 'painting';
           else 
              this.username = "?";
         },
+        startSession() {
+            this.fase = 'beforePainting';
+        },
         drawingSaved(val) {
-            this.fase = 'savedDrawing';
+            this.fase = 'paintingEnded';
             this.drawingMessage = val;
         },
         savePainting() {
           this.$refs.childComponent.savePaintingAlt();
-    }
+        },
+        startLoading() {
+          this.isLoading = true;
+        },
+        stopLoading(error) {
+           this.isLoading = false;
+           if (error) 
+               console.log(error);
+        }
   }
 }
 </script>
@@ -74,21 +101,44 @@ export default {
   margin-top: 3px;
 }
 aside {
-  width: 9%;
+  margin-left: 5em;
   float: left;
 }
-#painting {
-  margin-left: 12%;
-  border: 1px solid grey;
+aside.active {
+  width: 9%;
 }
-aside button, aside input {
+
+aside.hide {
+  width: 0%;
+}
+
+#painting {
+  border: 1px solid grey;
+  margin: 0 1em 0 1em;
+}
+header {
+  padding-bottom: 0.5em;
+}
+header span {
+  margin-left: 1em;
+}
+
+header span button {
+  border: 1px solid grey;
+  background-color: #ffffff; 
+  padding: 0.2em;
+}
+
+header span button:hover {
+  background-color:darkgoldenrod; 
+  color: #ffffff;
+}
+
+aside input {
+  border: 1px solid grey;
   display: block;
   margin: 0.3em;
   padding: 0.2em;
-  border: 1px solid grey;
-}
-aside button {
-  background-color:lightskyblue; 
 }
 
 aside label {
@@ -100,6 +150,11 @@ aside label {
   display: inline-block;
   width: 30px;
   height: 1em;
+}
+
+header p {
+  padding: 0 4em 0 4em;
+  margin-top: 1em;
 }
 
 </style>
