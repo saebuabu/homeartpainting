@@ -63,10 +63,14 @@ export default {
             .then(response => {
                 //console.log(response);
                 if (response.data.status == "ok") {
-                    image.src = response.data.response.imagedata;
-                    this.prevSession.username = response.data.response.username;
-                    this.prevSession.imagecreated = response.data.response.imagecreated;
- 
+                    if (response != null) {
+                        image.src = response.data.response.imagedata;
+                        this.prevSession.username = response.data.response.username;
+                        this.prevSession.imagecreated = response.data.response.imagecreated;
+                    } else {
+                        //Eerste sessie
+                        this.$emit('stop-Loading', 'Nog geen opgeslagen afbeeldingen');
+                    }
                 }
                 else {
                     this.errors.push(response.response);
@@ -76,6 +80,7 @@ export default {
             })
             .catch(error => {
                 this.errors.push("Server could not process " + error);
+                this.$emit('stop-Loading', error);
             });
 
         
@@ -111,8 +116,7 @@ export default {
                         //console.log(response);
                         if (response.data.status == "ok") {
                             console.log(response);
-                            this.$emit('stop-Loading');
-
+                            this.$emit('stop-Loading', 'Nieuwe schilderij is succesvol opgeslagen');
                         }
                         else {
                             this.errors.push(response.response);
@@ -121,6 +125,8 @@ export default {
                     })
                     .catch(error => {
                         this.errors.push("Server could not process, " + error);
+                        this.$emit('stop-Loading', error);
+    
                     });
         },
         downloadURI: function(uri, name) {

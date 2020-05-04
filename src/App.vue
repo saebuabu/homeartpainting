@@ -85,7 +85,7 @@ export default {
         stopLoading(error) {
            this.isLoading = false;
            if (error) 
-               console.log(error);
+               alert(error);
         }
   }
 }
