@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-      <header><h1>Titel? </h1>
+      <header><h1>Emmy Zwagers nodigt je uit..</h1>
       <p>
         Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. 
-        Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi. Nam eget dui.
-        <br><br><a href='http://kunstpodium-t.com/project/apprenticemaster/'>Apprentice master project 2020</a>
-        </p><br>            
+        Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+      </p> 
+      <Painters />
       <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
       <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
       <span v-if="this.fase == 'painting'" ><button v-on:click="savePainting">Save</button></span>
@@ -31,6 +31,7 @@
 import DrawArt from './components/DrawArt.vue'
 import Colorpicker from './components/Colorpicker.vue'
 import LoadingBar from "./components/LoadingBar";
+import Painters from "./components/Painters";
 
 
 export default {
@@ -38,7 +39,8 @@ export default {
   components: {
     DrawArt,
     Colorpicker,
-    LoadingBar
+    LoadingBar,
+    Painters
   },
   data() {
     return {
