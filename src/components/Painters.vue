@@ -1,17 +1,20 @@
 <template>
 <div id="painters">
-    <label>Artiesten: </label><ul> <li class="painters" v-for="painter in painters" :key="painter.username">
-    <span>{{ painter.imagecreated}}</span>{{ painter.username }} 
+    <label>Artiesten: </label><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
+    <span>{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">{{ painter.username }}</button> 
   </li></ul>
 </div>
 </template>
 
 <script>
+import { bus } from '../main'
+
 export default {
   data() {
     return {
       painters: null,
-      errors: []
+      errors: [],
+      activePainter: null
     }
   },
   computed: {
@@ -35,6 +38,14 @@ export default {
             .catch(error => {
                 this.errors.push("Server could not process " + error);
             });
+  },
+  methods: {
+    showPainterPainting(i) {
+      //console.log(this.painters[i].username);
+       bus.$emit('changePainting', this.painters[i].username);
+
+       this.activePainter = this.painters[i].username;
+    }
   }
 }
 </script>
@@ -46,6 +57,14 @@ export default {
   list-style-type: none;
   display: inline-block
 }
+.painters button:hover, .painters button.active {
+  background-color: darkgoldenrod;
+  color: white;
+}
+ .painters button.active {
+  padding: 0.1em;  
+ }
+
 .painters span{
   font-size: xx-small;
   padding-left: 1em;

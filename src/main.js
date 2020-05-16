@@ -16,6 +16,9 @@ else {
   Vue.prototype.$mongoresturl = "//saebu.nl/mongorest/";
 }
 
+//voor de communicatie tussen 2 componenten Painters => Drawart
+export const bus = new Vue();
+
 new Vue({
   vuetify,
   axios,

@@ -12,6 +12,8 @@ const querystring = require('querystring');
 const width = window.innerWidth - (window.innerWidth/16);
 const height = window.innerHeight - (window.innerHeight/10);
 
+import { bus } from '../main';
+
 export default {
   name: 'DrawArt',
   props: {
@@ -58,7 +60,6 @@ export default {
            versie wordt opgeslagen met de naam van de current gebruiker 
        **************************************************************/
         this.$emit('start-Loading');
-        
         this.axios.get(this.$mongoresturl + 'artget.php')
             .then(response => {
                 //console.log(response);
@@ -92,8 +93,81 @@ export default {
            this.context.drawImage(this.image,0,0,width, height);
            this.$emit('stop-Loading');
         }
+
+        bus.$on('changePainting', (data) => {
+            console.log("Change painting to painted by " + data);
+            const image = new window.Image();
+
+            this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
+            .then(response => {
+                //console.log(response);
+                if (response.data.status == "ok") {
+                    if (response != null) {
+                        image.src = response.data.response.imagedata;
+                        this.prevSession.username = response.data.response.username;
+                        this.prevSession.imagecreated = response.data.response.imagecreated;
+                    } else {
+                        //Eerste sessie
+                        this.$emit('stop-Loading', 'Niet gevonden');
+                    }
+                }
+                else {
+                    this.errors.push(response.response);
+                    this.$emit('stop-Loading', response.response);
+                }
+            })
+            .catch(error => {
+                this.errors.push("Server could not process " + error);
+                this.$emit('stop-Loading', error);
+            });
+
+            image.onload = () => {
+                this.image = image;
+                var theimg = this.$refs.image.getNode();        
+                this.context = theimg.getContext('2d');
+                this.context.drawImage(this.image,0,0,width, height);
+                this.$emit('stop-Loading');
+            }
+
+        })
+
     },
     methods: {
+        /*loadPaintingBy: function(p) {
+            const image = new window.Image();
+
+            this.axios.get(this.$mongoresturl + 'artget.php?a='+p)
+            .then(response => {
+                //console.log(response);
+                if (response.data.status == "ok") {
+                    if (response != null) {
+                        image.src = response.data.response.imagedata;
+                        this.prevSession.username = response.data.response.username;
+                        this.prevSession.imagecreated = response.data.response.imagecreated;
+                    } else {
+                        //Eerste sessie
+                        this.$emit('stop-Loading', 'Niet gevonden');
+                    }
+                }
+                else {
+                    this.errors.push(response.response);
+                    this.$emit('stop-Loading', response.response);
+                }
+            })
+            .catch(error => {
+                this.errors.push("Server could not process " + error);
+                this.$emit('stop-Loading', error);
+            });
+
+            image.onload = () => {
+                this.image = image;
+                var theimg = this.$refs.image.getNode();        
+                this.context = theimg.getContext('2d');
+                this.context.drawImage(this.image,0,0,width, height);
+                this.$emit('stop-Loading');
+            }
+
+        },*****************/
         savePaintingAlt: function () {
         /*
             dataUrl wordt uit de document canvas gehaald ipv de Konva canvas node
@@ -138,9 +212,7 @@ export default {
             document.body.removeChild(link);
             //delete link;
       },
-      updated() {
-      },
-        handleDown: function() {
+      handleDown: function() {
             if (this.fase == 'painting') {
                 this.isPaint = true;
                 this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
