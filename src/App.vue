@@ -1,10 +1,6 @@
 <template>
   <div id="app">
-      <header><h1>Emmy Zwagers nodigt je uit..</h1>
-      <p>
-        Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. 
-        Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
-      </p> 
+     <header>
       <Painters />
       <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
       <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
