@@ -1,12 +1,12 @@
 <template>
   <div id="app">
      <header>
+      <LoadingBar v-if="this.isLoading"/>
       <Painters />
       <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
       <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
       <span v-if="this.fase == 'painting'" ><button v-on:click="savePainting">Save</button></span>
       </header>
-      <LoadingBar v-if="this.isLoading"/>
       <aside v-bind:class="classObject">
         <div v-if="this.fase == 'beforePainting'">
           <h4>Naam: </h4><input type="text" v-model="username" name="username" placeholder="Naam?">
@@ -16,7 +16,7 @@
         </div>
       </aside>
 
-    <div id="painting" v-if="this.fase != 'beforePainting'">
+    <div id="painting" >
       <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
     </div>
   </div>
@@ -56,6 +56,17 @@ export default {
             }
         }
   },
+  created() {
+       window.onbeforeunload = function(){      
+            localStorage.removeItem('latest');
+          return false;
+        }
+    //
+        /************************** 
+        window.addEventListener('beforeunload', () => {
+            return "Zeker witten?";
+        }, false) ******************/
+    },
   methods: {
         colorSet(value) {
             this.colorcode = value;
@@ -90,6 +101,7 @@ export default {
 </script>
 
 <style>
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -99,11 +111,16 @@ export default {
   margin-top: 3px;
 }
 aside {
-  margin-left: 5em;
+  height: 33vh;
+  position: absolute;
+  margin-left: 1em;
   float: left;
+  background-color: azure;
+  z-index: 999999;
 }
+
 aside.active {
-  width: 9%;
+  width: 20vw;
 }
 
 aside.hide {
@@ -111,8 +128,8 @@ aside.hide {
 }
 
 #painting {
-  border: 1px solid grey;
-  margin: 0 1em 0 1em;
+  margin: 0 0 0 8px;
+  overflow-y: hidden;
 }
 header {
   padding-bottom: 0.5em;

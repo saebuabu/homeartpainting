@@ -8,9 +8,8 @@
 <script>
 
 const querystring = require('querystring');
-
-const width = window.innerWidth - (window.innerWidth/16);
-const height = window.innerHeight - (window.innerHeight/10);
+const width = window.innerWidth - 24;
+const height = window.innerHeight - (window.innerHeight/15);
 
 import { bus } from '../main';
 
@@ -34,7 +33,7 @@ export default {
     return {
       configStage: {
         width: width,
-        height: height      
+        height: height
       },
       configImage: {
           image: document.createElement('canvas'),
@@ -50,7 +49,16 @@ export default {
       image: null,
       errors: [],
       prevSession: {},
-      konvaLineSettings: {points: [], stroke: 'red', tension: 1}
+      konvaLineSettings: {points: [], stroke: 'red', tension: 1},
+      latest: localStorage.getItem('latest')
+    }
+   },
+  mounted() {
+    if(localStorage.latest) this.latest = localStorage.latest;
+  },
+  watch:{
+    latest(newName) {
+      localStorage.latest = newName;
     }
    },
     created() {
@@ -59,13 +67,15 @@ export default {
            De src van het achtergrond plaatje wordt uit de database opgehaald en hier getoond; de nieuwe gebruiker schildert er overheen en de nieuwe 
            versie wordt opgeslagen met de naam van de current gebruiker 
        **************************************************************/
-        this.$emit('start-Loading');
-        this.axios.get(this.$mongoresturl + 'artget.php')
+        if (this.latest == null) {
+            this.$emit('start-Loading');
+            this.axios.get(this.$mongoresturl + 'artget.php')
             .then(response => {
                 //console.log(response);
                 if (response.data.status == "ok") {
                     if (response != null) {
                         image.src = response.data.response.imagedata;
+                        this.latest = response.data.response.imagedata;
                         this.prevSession.username = response.data.response.username;
                         this.prevSession.imagecreated = response.data.response.imagecreated;
                     } else {
@@ -83,21 +93,26 @@ export default {
                 this.errors.push("Server could not process " + error);
                 this.$emit('stop-Loading', error);
             });
-
-        
-       image.onload = () => {
-           //console.log(image);
-           this.image = image;
-           var theimg = this.$refs.image.getNode();        
-           this.context = theimg.getContext('2d');
-           this.context.drawImage(this.image,0,0,width, height);
-           this.$emit('stop-Loading');
         }
+        else {
+            //niks doen?
+        }
+        
+        image.onload = () => {
+                //console.log(image);
+                this.image = image;
+                var theimg = this.$refs.image.getNode();        
+                this.context = theimg.getContext('2d');
+                this.context.drawImage(this.image,0,0,width, height);
+                this.$emit('stop-Loading');
+        }
+        
 
         bus.$on('changePainting', (data) => {
             console.log("Change painting to painted by " + data);
             const image = new window.Image();
 
+            this.$emit('start-Loading');
             this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
             .then(response => {
                 //console.log(response);
