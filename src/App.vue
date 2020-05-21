@@ -2,10 +2,9 @@
   <div id="app">
      <header>
       <LoadingBar v-if="this.isLoading"/>
-      <Painters />
+      <Painters v-if="this.fase == 'beforeStart' || this.fase == 'hasPainted'" :key="componentKey" :fase="fase" />
       <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
       <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
-      <span v-if="this.fase == 'painting'" ><button v-on:click="savePainting">Save</button></span>
       </header>
       <aside v-bind:class="classObject">
         <div v-if="this.fase == 'beforePainting'">
@@ -41,6 +40,7 @@ export default {
   data() {
     return {
     username: '',
+    componentKey: 0,
     colorcode: '#ff0000',
     fase: 'beforeStart' ,   //beforeStart, beforePainting, painting, PaintingEnded 
     isLoading: false,
@@ -68,6 +68,9 @@ export default {
         }, false) ******************/
     },
   methods: {
+        forceRenderer() {
+           this.componentKey +=1;
+        },
         colorSet(value) {
             this.colorcode = value;
             //console.log("kleur: "+value);
@@ -82,12 +85,14 @@ export default {
             this.fase = 'beforePainting';
         },
         drawingSaved(val) {
-            this.fase = 'paintingEnded';
+            this.fase = 'hasPainted';
             this.drawingMessage = val;
+            this.forceRenderer();
         },
-        savePainting() {
+/*****  savePainting() {
           this.$refs.childComponent.savePaintingAlt();
-        },
+          this.fase = 'hasPainted';
+        }, ****/
         startLoading() {
           this.isLoading = true;
         },

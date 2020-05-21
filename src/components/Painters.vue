@@ -17,9 +17,24 @@ export default {
       activePainter: null
     }
   },
+  props: {
+      fase: {
+          type: String
+      }
+  },
   computed: {
   },
-  mounted() {
+  created() {
+        this.laadPainters();
+        //nadat een nieuwe schilder heeft geschilderd opnieuw laden
+       bus.$on('newPainter', () => { 
+          console.log("ververs painters...");
+          this.laadPainters()
+        }); 
+  },
+  methods: {
+    laadPainters() {
+       console.log("Painters laden...");
         this.axios.get(this.$mongoresturl + 'artists.php')
             .then(response => {
                 //console.log(response);
@@ -38,8 +53,8 @@ export default {
             .catch(error => {
                 this.errors.push("Server could not process " + error);
             });
-  },
-  methods: {
+
+    },
     showPainterPainting(i) {
       //console.log(this.painters[i].username);
        bus.$emit('changePainting', this.painters[i].username);

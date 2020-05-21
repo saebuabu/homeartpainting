@@ -1,9 +1,11 @@
 <template>
+   <div><span>{{ status }}</span>
   <v-stage  ref="stage" :config="configStage">
     <v-layer  ref="layer">
         <v-image @mousedown="handleDown" @touchstart="handleDown" @mousemove="handleMove" @touchmove="handleMove" @mouseup="handleUp" @touchend="handleUp" ref="image" :config="configImage" />
     </v-layer>
   </v-stage>
+  </div>
 </template>
 <script>
 
@@ -23,7 +25,7 @@ export default {
           type: String
       },
       brushwidth: {
-          type: String
+          type: Number
       },
       fase: {
           type: String
@@ -42,7 +44,9 @@ export default {
            x: 0,
            y: 0     
       },
-      isPaint: false,
+      timer: 3 + Math.floor(Math.random() * 10), // tussen 3 en 12seconden krijg je de tijd
+      isPaint: false,  // kijkt of mousedown is dan wordt ie true
+      sessionStarted: false, //true als de eerste streek wordt gezet, false als de tijd(timer) op is
       lastPointerPosition: null,
       context: null,
       prevImageDrewn: false,
@@ -60,6 +64,18 @@ export default {
     latest(newName) {
       localStorage.latest = newName;
     }
+   },
+   computed: {
+        status: function() {
+            if (this.fase == "beforePainting")
+                return "Druk op start om te beginnen...";
+            else if (this.fase == "hasPainted")
+                return "";
+            else if (this.fase == "painting")
+                return "Je hebt nog " + this.timer + " seconden...";
+            else
+                return "";
+        }
    },
     created() {
        const image = new window.Image();
@@ -148,41 +164,6 @@ export default {
 
     },
     methods: {
-        /*loadPaintingBy: function(p) {
-            const image = new window.Image();
-
-            this.axios.get(this.$mongoresturl + 'artget.php?a='+p)
-            .then(response => {
-                //console.log(response);
-                if (response.data.status == "ok") {
-                    if (response != null) {
-                        image.src = response.data.response.imagedata;
-                        this.prevSession.username = response.data.response.username;
-                        this.prevSession.imagecreated = response.data.response.imagecreated;
-                    } else {
-                        //Eerste sessie
-                        this.$emit('stop-Loading', 'Niet gevonden');
-                    }
-                }
-                else {
-                    this.errors.push(response.response);
-                    this.$emit('stop-Loading', response.response);
-                }
-            })
-            .catch(error => {
-                this.errors.push("Server could not process " + error);
-                this.$emit('stop-Loading', error);
-            });
-
-            image.onload = () => {
-                this.image = image;
-                var theimg = this.$refs.image.getNode();        
-                this.context = theimg.getContext('2d');
-                this.context.drawImage(this.image,0,0,width, height);
-                this.$emit('stop-Loading');
-            }
-
-        },*****************/
         savePaintingAlt: function () {
         /*
             dataUrl wordt uit de document canvas gehaald ipv de Konva canvas node
@@ -190,7 +171,6 @@ export default {
         */
                 var thecanvas = document.querySelector("canvas");
                 var dataURL= thecanvas.toDataURL();
-                //TODO Deze schilderij moet nog in een database worden opgeslagen
                 
                 //Test om te kijken of het nieuw getekende ook wordt meegwenomen
                 //this.downloadURI(dataURL, 'canvas.png');
@@ -204,12 +184,14 @@ export default {
                     .then(response => {
                         //console.log(response);
                         if (response.data.status == "ok") {
-                            console.log(response);
+                            //console.log(response);
+                            bus.$emit('newPainter');
+
                             this.$emit('stop-Loading', 'Nieuwe schilderij is succesvol opgeslagen');
                         }
                         else {
                             this.errors.push(response.response);
-                             this.$emit('stop-Loading', response.response);
+                            this.$emit('stop-Loading', response.response);
                         }
                     })
                     .catch(error => {
@@ -229,7 +211,15 @@ export default {
       },
       handleDown: function() {
             if (this.fase == 'painting') {
+                // repeat with the interval of 2 seconds
+                if (!this.sessionStarted) {
+                    let timerId = setInterval(() => --this.timer, 1000);
+                    setTimeout(() => { clearInterval(timerId); this.savePaintingAlt() }, this.timer * 1000);
+                }
+
+                this.sessionStarted = true;
                 this.isPaint = true;
+
                 this.lastPointerPosition = this.$refs.stage.getNode().getPointerPosition(); 
                 if (!this.prevImageDrewn) {
 
