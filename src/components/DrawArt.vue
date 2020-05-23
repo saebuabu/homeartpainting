@@ -85,6 +85,7 @@ export default {
        **************************************************************/
         if (this.latest == null) {
             this.$emit('start-Loading');
+            //uit de database ophalen
             this.axios.get(this.$mongoresturl + 'artget.php')
             .then(response => {
                 //console.log(response);
@@ -111,7 +112,8 @@ export default {
             });
         }
         else {
-            //niks doen?
+            console.log('latest uit localstorage gehaald');
+            image.src = this.latest;
         }
         
         image.onload = () => {
@@ -129,9 +131,34 @@ export default {
             console.log("Change painting to painted by " + data);
             const image = new window.Image();
     
-
             this.$emit('start-Loading');
-            this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
+
+            //ophalen van de webserver, indien niet gevonden dan uit de database
+            this.axios.get(this.$mongoresturl + 'getimagedata.php?u='+data)
+            .then(response => {
+                //console.log(response);
+                if (response.data.status == "ok") {
+                    if (response != null) {
+                        image.src = response.data.response.imagedata;
+                    } else {
+                        //Eerste sessie
+                        this.$emit('stop-Loading', 'Niet gevonden');
+                    }
+                }
+                else {
+                    this.errors.push(response.response);
+                    this.$emit('stop-Loading', response.response);
+                }
+            })
+            .catch(error => {
+                this.errors.push("Server could not process " + error);
+                this.$emit('stop-Loading', error);
+            });
+
+
+            //ophalen uit de database
+           /***************************************************************** 
+           this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
             .then(response => {
                 //console.log(response);
                 if (response.data.status == "ok") {
@@ -152,7 +179,7 @@ export default {
             .catch(error => {
                 this.errors.push("Server could not process " + error);
                 this.$emit('stop-Loading', error);
-            });
+            }); ***************************************************/
 
             image.onload = () => {
                 this.image = image;
