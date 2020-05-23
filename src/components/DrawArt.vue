@@ -124,9 +124,11 @@ export default {
         }
         
 
+        // Andere schilder is gekozen
         bus.$on('changePainting', (data) => {
             console.log("Change painting to painted by " + data);
             const image = new window.Image();
+    
 
             this.$emit('start-Loading');
             this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
@@ -154,8 +156,9 @@ export default {
 
             image.onload = () => {
                 this.image = image;
-                var theimg = this.$refs.image.getNode();        
+                var theimg = this.$refs.image.getNode();   
                 this.context = theimg.getContext('2d');
+                this.context.clearRect(0, 0, width, height);
                 this.context.drawImage(this.image,0,0,width, height);
                 this.$emit('stop-Loading');
             }
@@ -214,7 +217,14 @@ export default {
                 // repeat with the interval of 2 seconds
                 if (!this.sessionStarted) {
                     let timerId = setInterval(() => --this.timer, 1000);
-                    setTimeout(() => { clearInterval(timerId); this.savePaintingAlt() }, this.timer * 1000);
+                    setTimeout(() => { 
+                                         clearInterval(timerId); 
+                                         this.savePaintingAlt();
+                                         this.sessionStarted = false;
+                                         this.isPaint = false;
+                                         this.fase = 'hasPainted';
+                                      
+                                     }, this.timer * 1000);
                 }
 
                 this.sessionStarted = true;
