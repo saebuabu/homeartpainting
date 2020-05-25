@@ -56,15 +56,14 @@ export default {
       konvaLineSettings: {points: [], stroke: 'red', tension: 1},
       latest: localStorage.getItem('latest'),
       windowWidth: 0,
-      windowHeight: 0,
-      resizeTimer: null
+      windowHeight: 0
     }
    },
   mounted() {
     if(localStorage.latest) this.latest = localStorage.latest;
 
     this.$nextTick(function() {
-      window.addEventListener('resize', this.resizeWindowHandler);
+                window.addEventListener('resize', this.resizeWindowHandler);
       //Init
       this.resizeWindowHandler();
     })
@@ -205,21 +204,11 @@ export default {
     },
     methods: {
         resizeWindowHandler() {
-
-            if (this.resizeTimer)
-                clearTimeout(this.resizeTimer);
-        
-            //het redrawen vertragen met 250 msec
-            this.resizeTimer = setTimeout(function() {
-
+            var theimg = this.$refs.image.getNode();   
+            this.context = theimg.getContext('2d');
+ 
                 console.log("window resized");
-                var theimg = this.$refs.image.getNode();   
-                this.context = theimg.getContext('2d');
-                if (this.context) 
-                {
-                    //console.log("clear canvas");
-                    this.context.clearRect(0, 0, this.width, this.height);
-                }
+                this.context.clearRect(0, 0, width, height);
                 this.windowWidth = document.documentElement.clientWidth;
                 this.windowHeight = document.documentElement.clientHeight;
 
@@ -230,7 +219,6 @@ export default {
                     console.log("first time fail");
                 }
 
-        }, 250);
       },
       savePaintingAlt: function () {
         /*
