@@ -54,12 +54,22 @@ export default {
       errors: [],
       prevSession: {},
       konvaLineSettings: {points: [], stroke: 'red', tension: 1},
-      latest: localStorage.getItem('latest')
+      latest: localStorage.getItem('latest'),
+      windowWidth: 0,
+      windowHeight: 0,
+      resizeTimer: null
     }
    },
   mounted() {
     if(localStorage.latest) this.latest = localStorage.latest;
-  },
+
+    this.$nextTick(function() {
+      window.addEventListener('resize', this.resizeWindowHandler);
+      //Init
+      this.resizeWindowHandler();
+    })
+
+},
   watch:{
     latest(newName) {
       localStorage.latest = newName;
@@ -194,7 +204,35 @@ export default {
 
     },
     methods: {
-        savePaintingAlt: function () {
+        resizeWindowHandler() {
+
+            if (this.resizeTimer)
+                clearTimeout(this.resizeTimer);
+        
+            //het redrawen vertragen met 250 msec
+            this.resizeTimer = setTimeout(function() {
+
+                console.log("window resized");
+                var theimg = this.$refs.image.getNode();   
+                this.context = theimg.getContext('2d');
+                if (this.context) 
+                {
+                    //console.log("clear canvas");
+                    this.context.clearRect(0, 0, this.width, this.height);
+                }
+                this.windowWidth = document.documentElement.clientWidth;
+                this.windowHeight = document.documentElement.clientHeight;
+
+                try {
+                    this.context.drawImage(this.image,0,0,this.windowWidth, this.windowHeight);
+                }
+                catch {
+                    console.log("first time fail");
+                }
+
+        }, 250);
+      },
+      savePaintingAlt: function () {
         /*
             dataUrl wordt uit de document canvas gehaald ipv de Konva canvas node
             anders komt het getekende niet mee in de dataURL
@@ -309,6 +347,9 @@ export default {
 
 
         }
+    },
+    beforeDestroy() {
+        window.removeEventListener('resize', this.resizeWindowHandler);
     }
 }
 </script>
