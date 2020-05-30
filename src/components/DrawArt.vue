@@ -55,6 +55,7 @@ export default {
       prevSession: {},
       konvaLineSettings: {points: [], stroke: 'red', tension: 1},
       latest: localStorage.getItem('latest'),
+      prevDimensionsWindow: {w: width, h: height},
       windowWidth: 0,
       windowHeight: 0
     }
@@ -63,9 +64,9 @@ export default {
     if(localStorage.latest) this.latest = localStorage.latest;
 
     this.$nextTick(function() {
-                window.addEventListener('resize', this.resizeWindowHandler);
-      //Init
-      this.resizeWindowHandler();
+      //window.addEventListener('resize', this.resizeWindowHandler);
+      
+      //window.addEventListener("orientationchange", this.resizeWindowHandler);
     })
 
 },
@@ -164,32 +165,6 @@ export default {
                 this.$emit('stop-Loading', error);
             });
 
-
-            //ophalen uit de database
-           /***************************************************************** 
-           this.axios.get(this.$mongoresturl + 'artget.php?a='+data)
-            .then(response => {
-                //console.log(response);
-                if (response.data.status == "ok") {
-                    if (response != null) {
-                        image.src = response.data.response.imagedata;
-                        this.prevSession.username = response.data.response.username;
-                        this.prevSession.imagecreated = response.data.response.imagecreated;
-                    } else {
-                        //Eerste sessie
-                        this.$emit('stop-Loading', 'Niet gevonden');
-                    }
-                }
-                else {
-                    this.errors.push(response.response);
-                    this.$emit('stop-Loading', response.response);
-                }
-            })
-            .catch(error => {
-                this.errors.push("Server could not process " + error);
-                this.$emit('stop-Loading', error);
-            }); ***************************************************/
-
             image.onload = () => {
                 this.image = image;
                 var theimg = this.$refs.image.getNode();   
@@ -203,21 +178,33 @@ export default {
 
     },
     methods: {
+        setCookie() {
+                this.$cookies.set('AXRXTX','penelope');
+                this.$cookies.set('wordpress','themeDefault');
+        },
         resizeWindowHandler() {
             var theimg = this.$refs.image.getNode();   
             this.context = theimg.getContext('2d');
  
-                console.log("window resized");
-                this.context.clearRect(0, 0, width, height);
-                this.windowWidth = document.documentElement.clientWidth;
-                this.windowHeight = document.documentElement.clientHeight;
+                console.log("orientation changed or window made bigger" );
 
-                try {
-                    this.context.drawImage(this.image,0,0,this.windowWidth, this.windowHeight);
+            
+                this.context.clearRect(0, 0, width, height);
+                this.windowWidth = window.innerWidth - 24; //document.documentElement.clientWidth;
+                this.windowHeight = window.innerHeight - (window.innerHeight/15); //document.documentElement.clientHeight;
+
+                // Wordt het scherm breder of hoger gemaakt?
+                if (this.prevDimensionsWindow.w < this.windowWidth || this.prevDimensionsWindow.h < this.windowHeight) {
+                    try {
+                        this.context.drawImage(this.image,0,0,this.windowWidth, this.windowHeight);
+                    }
+                    catch {
+                        console.log("fail drawImage");
+                    }
                 }
-                catch {
-                    console.log("first time fail");
-                }
+
+                this.prevDimensionsWindow.w = this.windowWidth;
+                this.prevDimensionsWindow.h = this.windowHeight;
 
       },
       savePaintingAlt: function () {
@@ -276,7 +263,7 @@ export default {
                                          this.sessionStarted = false;
                                          this.isPaint = false;
                                          this.fase = 'hasPainted';
-                                      
+                                         this.setCookie();                                      
                                      }, this.timer * 1000);
                 }
 

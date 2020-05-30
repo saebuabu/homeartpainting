@@ -1,6 +1,6 @@
 <template>
 <div id="painters">
-    <label>Kunstenaars/artists: </label><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
+    <label>Online canvas artists: </label><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
     <span>{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">{{ painter.username }}</button> 
   </li></ul>
 </div>

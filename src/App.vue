@@ -1,9 +1,12 @@
 <template>
   <div id="app">
+    <div class="site-branding">
+        <p class="site-title"><a href="https://www.emmyzwagers.nl/" rel="home">EMMY ZWAGERS</a></p>				
+    </div>
      <header>
       <LoadingBar v-if="this.isLoading"/>
       <Painters v-if="this.fase == 'beforeStart' || this.fase == 'hasPainted'" :key="componentKey" :fase="fase" />
-      <span v-if="this.fase == 'beforeStart'"><button v-on:click="startSession">Start nieuwe sessie</button></span>
+      <span v-if="this.fase == 'beforeStart' && !alreadyPainted"><button v-on:click="startSession">Start nieuwe sessie</button></span>
       <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
       </header>
       <aside v-bind:class="classObject">
@@ -27,6 +30,7 @@ import DrawArt from './components/DrawArt.vue'
 import Colorpicker from './components/Colorpicker.vue'
 import LoadingBar from "./components/LoadingBar";
 import Painters from "./components/Painters";
+
 
 
 export default {
@@ -54,6 +58,10 @@ export default {
                 active: this.fase == 'beforePainting',
                 'hide': this.fase != 'beforePainting'
             }
+        },
+        alreadyPainted: function() {
+            this.$cookies.config('30d');
+            return ( this.$cookies.get('wordpress') || this.$cookies.get('AXRXTX') ) ? true : false;
         }
   },
   created() {
@@ -61,12 +69,8 @@ export default {
             localStorage.removeItem('latest');
           return false;
         }
-    //
-        /************************** 
-        window.addEventListener('beforeunload', () => {
-            return "Zeker witten?";
-        }, false) ******************/
-    },
+
+  },
   methods: {
         forceRenderer() {
            this.componentKey +=1;
@@ -89,10 +93,6 @@ export default {
             this.drawingMessage = val;
             this.forceRenderer();
         },
-/*****  savePainting() {
-          this.$refs.childComponent.savePaintingAlt();
-          this.fase = 'hasPainted';
-        }, ****/
         startLoading() {
           this.isLoading = true;
         },
@@ -108,13 +108,32 @@ export default {
 <style>
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   margin-top: 3px;
 }
+
+.site-title {
+	clear: both;
+	margin-top: 0;
+	margin-bottom: 0;
+	padding-top: 1em;
+	font-family: Helvetica, Arial, sans-serif;
+	font-size: 24px;
+	font-size: 1.5rem;
+	font-weight: bold;
+	line-height: 24px;
+	line-height: 1.5rem;
+}
+
+.site-title a {
+	color: #1e1e1e;
+}
+
 aside {
   height: 33vh;
   position: absolute;

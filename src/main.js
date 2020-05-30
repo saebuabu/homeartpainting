@@ -3,7 +3,9 @@ import axios from './plugins/axios'
 import App from './App.vue'
 import VueKonva from 'vue-konva'
 import vuetify from './plugins/vuetify';
+import VueCookies from 'vue-cookies';
 
+Vue.use(VueCookies)
 Vue.use(axios)
 Vue.use(VueKonva)
 Vue.config.productionTip = false
@@ -22,5 +24,6 @@ export const bus = new Vue();
 new Vue({
   vuetify,
   axios,
+  VueCookies,
   render: h => h(App)
 }).$mount('#app')
