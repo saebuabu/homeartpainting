@@ -18,8 +18,4 @@ methods: {
                this.$emit('country-Set',this.country);
   }
 }
-
 </script>
-<style scoped>
-
-</style>

@@ -117,7 +117,7 @@ export default {
 <style>
 
 #app {
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: "Helvetica", Helvetica Neue;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -126,24 +126,28 @@ export default {
   margin-top: 3px;
 }
 
-.site-title {
+.site-title, .site-title a {
 	clear: both;
 	margin-top: 0;
 	margin-bottom: 0;
 	padding-top: 1em;
-	font-family: Helvetica, Arial, sans-serif;
-	font-size: 24px;
-	font-size: 1.5rem;
-	font-weight: bold;
-	line-height: 24px;
-	line-height: 1.5rem;
+  color: #54595F;
+  font-family: "Helvetica", Helvetica Neue;
   font-size: 1em;
   line-height: 2em;
+  letter-spacing: 0.9px;
+  font-weight: bold;
+  text-decoration: none;
 }
 
-.site-title a {
-	color: #1e1e1e;
+.site-title a:hover {
+    color: rgba(170, 66, 66, 0.22);
 }
+
+
+
+
+
 
 aside {
   left: 10%;

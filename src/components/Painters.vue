@@ -78,11 +78,12 @@ export default {
 }
 .painters {
   list-style-type: none;
-  display: inline-block
+  display: inline-block;
+  height: 1.4em;
 }
+
 .painters button:hover, .painters button.active {
-  background-color: darkgoldenrod;
-  color: white;
+  color: rgba(170, 66, 66, 0.22);
 }
  .painters button.active {
   padding: 0.1em;  
