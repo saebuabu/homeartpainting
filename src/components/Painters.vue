@@ -1,6 +1,6 @@
 <template>
 <div id="painters">
-    <label>Online canvas artists: </label><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
+    <h3>Online canvas artists: </h3><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
     <span><country-flag :country='painter.country' size='small' />{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
      {{ painter.username }}</button> 
   </li></ul>
@@ -73,6 +73,9 @@ export default {
 #painters {
    margin: 0.5em 4em 0.5em 4em;
 }
+#painters h3 {
+   margin-bottom: 0.5em;
+}
 .painters {
   list-style-type: none;
   display: inline-block
@@ -87,7 +90,7 @@ export default {
 
 .painters span{
   font-size: xx-small;
-  padding-left: 1em;
+  padding: 0;
 }
 .painters span::after {
   content: ' | ';
@@ -96,6 +99,7 @@ export default {
   top: -1.7em;
   position: relative;
   max-width: 60px;
+  padding: 0;
 }
 
 </style>

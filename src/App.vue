@@ -11,6 +11,7 @@
       </header>
       <aside v-bind:class="classObject">
         <div v-if="this.fase == 'beforePainting'">
+          <h3>Painting settings</h3>
           <h4>Full name: </h4><input type="text" v-model="username" >
           <h4>Country: </h4>
           <vueCountryRegionSelect @country-Set="countrySet"/>          
@@ -145,20 +146,34 @@ export default {
 }
 
 aside {
-  height: 33vh;
+  left: 10%;
+  margin: auto;
   position: absolute;
-  margin-left: 1em;
-  float: left;
-  background-color: azure;
+  background-color: #fff;
   z-index: 999999;
+  height: 90vh;
+}
+
+aside h3 {
+  text-decoration: underline;
+  margin-bottom: 0.5em;
+}
+
+aside h4{
+  text-align: left;
 }
 
 aside.active {
-  width: 20vw;
+  width: 25vw;
+  border: 1px solid black;
 }
 
 aside.hide {
   width: 0%;
+}
+
+aside > div {
+  padding-left: 1.5em;
 }
 
 #painting {
