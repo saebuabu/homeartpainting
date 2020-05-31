@@ -29,6 +29,9 @@ export default {
       },
       fase: {
           type: String
+      },
+      country: {
+          type: String
       }
    },
    data() {
@@ -78,11 +81,11 @@ export default {
    computed: {
         status: function() {
             if (this.fase == "beforePainting")
-                return "Druk op start om te beginnen...";
+                return "Clik on start ...";
             else if (this.fase == "hasPainted")
                 return "";
             else if (this.fase == "painting")
-                return "Je hebt nog " + this.timer + " seconden...";
+                return "There are " + this.timer + " seconds left to paint...";
             else
                 return "";
         }
@@ -222,6 +225,7 @@ export default {
 
                 this.axios.post(this.$mongoresturl + 'artsave.php', querystring.stringify({
                         username : this.username,
+                        country: this.country,
                         imagedata : dataURL
                     }))
                     .then(response => {

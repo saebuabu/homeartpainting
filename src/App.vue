@@ -11,15 +11,17 @@
       </header>
       <aside v-bind:class="classObject">
         <div v-if="this.fase == 'beforePainting'">
-          <h4>Naam: </h4><input type="text" v-model="username" name="username" placeholder="Naam?">
-          <h4>Kwastdikte: </h4><input type="number" v-model="brushwidth" name="brushwidth" placeholder="Dikte kwast?">
-          <h4>Kleur:</h4>
+          <h4>Full name: </h4><input type="text" v-model="username" >
+          <h4>Country: </h4>
+          <vueCountryRegionSelect @country-Set="countrySet"/>          
+          <h4>BrushWidth: </h4><input type="number" v-model="brushwidth" min="1" max="18" >
+          <h4>Color:</h4>
           <Colorpicker @color-Set="colorSet" />
         </div>
       </aside>
 
     <div id="painting" >
-      <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" ref="childComponent"/>
+      <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" :country="country" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -30,7 +32,7 @@ import DrawArt from './components/DrawArt.vue'
 import Colorpicker from './components/Colorpicker.vue'
 import LoadingBar from "./components/LoadingBar";
 import Painters from "./components/Painters";
-
+import vueCountryRegionSelect from "./components/vueCountryRegionSelect.vue";
 
 
 export default {
@@ -39,7 +41,8 @@ export default {
     DrawArt,
     Colorpicker,
     LoadingBar,
-    Painters
+    Painters,
+    vueCountryRegionSelect
   },
   data() {
     return {
@@ -49,7 +52,8 @@ export default {
     fase: 'beforeStart' ,   //beforeStart, beforePainting, painting, PaintingEnded 
     isLoading: false,
     brushwidth: 5,
-    drawingMessage: ''
+    drawingMessage: '',
+    country: 'NL'
     }
   },
   computed: {
@@ -72,6 +76,10 @@ export default {
 
   },
   methods: {
+        countrySet(value) {
+            console.log("Country geselecteerd " + value);
+            this.country = value;
+        },
         forceRenderer() {
            this.componentKey +=1;
         },
@@ -128,6 +136,8 @@ export default {
 	font-weight: bold;
 	line-height: 24px;
 	line-height: 1.5rem;
+  font-size: 1em;
+  line-height: 2em;
 }
 
 .site-title a {
@@ -173,11 +183,12 @@ header span button:hover {
   color: #ffffff;
 }
 
-aside input {
+aside input, aside select {
   border: 1px solid grey;
   display: block;
   margin: 0.3em;
   padding: 0.2em;
+  max-width: 200px;
 }
 
 aside label {

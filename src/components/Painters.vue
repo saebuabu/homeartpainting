@@ -1,15 +1,20 @@
 <template>
 <div id="painters">
     <label>Online canvas artists: </label><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
-    <span>{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">{{ painter.username }}</button> 
+    <span><country-flag :country='painter.country' size='small' />{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
+     {{ painter.username }}</button> 
   </li></ul>
 </div>
 </template>
 
 <script>
 import { bus } from '../main'
+import CountryFlag from 'vue-country-flag'
 
 export default {
+  components: {
+       CountryFlag
+  },
   data() {
     return {
       painters: null,
@@ -87,4 +92,10 @@ export default {
 .painters span::after {
   content: ' | ';
 }
+.flag {
+  top: -1.7em;
+  position: relative;
+  max-width: 60px;
+}
+
 </style>

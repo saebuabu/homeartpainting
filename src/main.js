@@ -4,7 +4,12 @@ import App from './App.vue'
 import VueKonva from 'vue-konva'
 import vuetify from './plugins/vuetify';
 import VueCookies from 'vue-cookies';
+import vueCountryRegionSelect from 'vue-country-region-select';
+import CountryFlag from 'vue-country-flag'
+ 
+Vue.component('country-flag', CountryFlag)
 
+Vue.use(vueCountryRegionSelect)
 Vue.use(VueCookies)
 Vue.use(axios)
 Vue.use(VueKonva)
@@ -25,5 +30,6 @@ new Vue({
   vuetify,
   axios,
   VueCookies,
+  vueCountryRegionSelect,
   render: h => h(App)
 }).$mount('#app')
