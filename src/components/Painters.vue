@@ -1,9 +1,12 @@
 <template>
 <div id="painters">
-    <h3>Online canvas artists: </h3><ul> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
-    <span><country-flag :country='painter.country' size='small' />{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
+    <h3>ONLINE CANVAS</h3>
+    <h4 >artists</h4>
+    <ul class="painters-wrapper" v-if="painters.length > 0"> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
+    <country-flag :country='painter.country' size='small' /><span class="timecreated">{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
      {{ painter.username }}</button> 
-  </li></ul>
+    </li></ul>
+    <span v-if="painters.length == 0">Nobody has started painting</span>
 </div>
 </template>
 
@@ -32,8 +35,12 @@ export default {
   created() {
         this.laadPainters();
         //nadat een nieuwe schilder heeft geschilderd opnieuw laden
-       bus.$on('newPainter', () => { 
+       bus.$on('newPainter', (username) => { 
           console.log("ververs painters...");
+
+          if (username) 
+                    bus.$emit('changePainting', username);
+
           this.laadPainters()
         }); 
   },
@@ -102,5 +109,62 @@ export default {
   max-width: 60px;
   padding: 0;
 }
+
+@media only screen and (max-width: 768px) {
+
+  .painters-wrapper {
+      display: none;
+  }
+
+
+.site-title, .site-title a {
+    font-size: 1.2rem;
+  }
+
+.site-title.left {
+    padding-right: 0%;
+  }
+
+header #painters.open {
+    display: block;
+}
+
+
+
+header #painters {
+   margin: .1em;
+}
+
+header #painters span{
+   width: 4em;
+   display: float;
+   float: left;
+}
+
+header #painters span.flag{
+   right: -0.2em;
+   top: -1.2em;
+
+}
+
+header #painters .timecreated{
+   display: none;
+}
+
+#painters span::after {
+  content: '';
+}
+
+.painters {
+  list-style-type: none;
+  display: inline-block;
+  height: 1.4em;
+  font-size: 0.8rem;
+}
+
+
+
+}
+
 
 </style>

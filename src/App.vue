@@ -1,28 +1,36 @@
 <template>
   <div id="app">
     <div class="site-branding">
-        <p class="site-title"><a href="https://www.emmyzwagers.nl/" rel="home">EMMY ZWAGERS</a></p>				
+        <p class="site-title left"><a href="https://www.emmyzwagers.nl/" rel="home">EMMY ZWAGERS</a></p>				
+        <p class="site-title right"><a href="http://abu.saebu.nl/doku.php?id=ict_diensten" rel="partner site">ABU SAEBU</a></p>				
     </div>
      <header>
       <LoadingBar v-if="this.isLoading"/>
-      <Painters v-if="this.fase == 'beforeStart' || this.fase == 'hasPainted'" :key="componentKey" :fase="fase" />
+      <Painters v-if="this.fase == 'beforeStart' || this.fase == 'paintingEnded'" :key="componentKey" :fase="fase" />
       <span v-if="this.fase == 'beforeStart' && !alreadyPainted"><button v-on:click="startSession">Start nieuwe sessie</button></span>
-      <span v-if="this.fase == 'beforePainting'" ><button  v-on:click="startDrawing">Start</button></span>
+      <span v-if="this.fase == 'beforePainting' && !viewer" ><button  v-on:click="startDrawing">Start</button></span>
+      <span class="server-message" :class="{ red: this.fase == 'beforePainting'  }">&nbsp;{{ serverMessage }}</span>
       </header>
       <aside v-bind:class="classObject">
-        <div v-if="this.fase == 'beforePainting'">
+        <div v-if="this.fase == 'beforePainting' && !viewer">
           <h3>Painting settings</h3>
+          <div><b>Instructions</b><br>
+1. Enter Your Full Name and Location<br>
+2. Choose Your Brush size and Colour<br>
+3. You Get 3-10 sec to Make Your Mark, Hurry!</div>
+          <div>
           <h4>Full name: </h4><input type="text" v-model="username" >
           <h4>Country: </h4>
           <vueCountryRegionSelect @country-Set="countrySet"/>          
-          <h4>BrushWidth: </h4><input type="number" v-model="brushwidth" min="1" max="18" >
+          <h4>Brush width: </h4><input type="number" v-model="brushwidth" min="1" max="18" >
           <h4>Color:</h4>
           <Colorpicker @color-Set="colorSet" />
+          </div>
         </div>
       </aside>
 
     <div id="painting" >
-      <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" :country="country" ref="childComponent"/>
+      <DrawArt @start-Loading="startLoading" @stop-Loading="stopLoading" @drawing-Saved="drawingSaved" :viewer="viewer" :fase="fase" :username="username" :colorcode="colorcode" :brushwidth="brushwidth" :country="country" ref="childComponent"/>
     </div>
   </div>
 </template>
@@ -34,7 +42,17 @@ import Colorpicker from './components/Colorpicker.vue'
 import LoadingBar from "./components/LoadingBar";
 import Painters from "./components/Painters";
 import vueCountryRegionSelect from "./components/vueCountryRegionSelect.vue";
+import socketio from "socket.io-client";
 
+var options = {
+          rememberUpgrade:true,
+          transports: ['websocket'],
+          secure:true, 
+          rejectUnauthorized: false
+              }
+
+const socket = socketio('//artsocketpainting.herokuapp.com', options);
+//const socket = socketio('//localhost:5000', options);
 
 export default {
   name: 'App',
@@ -50,17 +68,20 @@ export default {
     username: '',
     componentKey: 0,
     colorcode: '#ff0000',
-    fase: 'beforeStart' ,   //beforeStart, beforePainting, painting, PaintingEnded 
+    fase: 'beforeStart' ,   //beforeStart, beforePainting, painting, paintingEnded
     isLoading: false,
     brushwidth: 5,
     drawingMessage: '',
-    country: 'NL'
+    country: 'NL',
+    serverMessage: '',
+    isConnected : false,
+    viewer : true
     }
   },
   computed: {
         classObject: function() {
             return {
-                active: this.fase == 'beforePainting',
+                active: this.fase == 'beforePainting' && !this.viewer,
                 'hide': this.fase != 'beforePainting'
             }
         },
@@ -70,11 +91,33 @@ export default {
         }
   },
   created() {
+      socket.emit("painterOnline", "" );
        window.onbeforeunload = function(){      
+            socket.emit("painterOffline", "" );
             localStorage.removeItem('latest');
           return false;
-        }
+        },
+        socket.on('message', data => {
+              this.serverMessage = data.message;
+            
+              this.username = data.painter ? data.painter : '';
+            
+            //this.viewer om te voorkomen dat je door je eigen actie wordt geblokkeerd
+              if (data.action == "block" && this.viewer) {
+                this.fase = "beforePainting";
+              }
+              else if (data.action == "refresh" && this.viewer) {
+                this.fase = "paintingEnded";
+              }
+        });
+  },
+  mounted() {
+        socket.on('connect', () => {
+              this.serverMessage = "connected";
+        });
 
+
+ 
   },
   methods: {
         countrySet(value) {
@@ -89,16 +132,24 @@ export default {
             //console.log("kleur: "+value);
         },
         startDrawing() {
-          if (this.username.length > 2)
+          this.viewer = false;
+          if (this.username.length > 2 && this.country.length > 0) {
             this.fase = 'painting';
-          else 
-             this.username = "?";
+            socket.emit("painterPainting", this.username );
+          }
+          else  {
+              alert("Please fill in your name and country");
+          }
         },
         startSession() {
+            //vanaf nu ben je in actie en is de rest verplicht viewer
+            this.viewer = false;
+            socket.emit("painterStarted", "" );
             this.fase = 'beforePainting';
         },
         drawingSaved(val) {
-            this.fase = 'hasPainted';
+            socket.emit("painterNewPainting", this.username );
+            this.fase = 'paintingEnded';
             this.drawingMessage = val;
             this.forceRenderer();
         },
@@ -117,7 +168,7 @@ export default {
 <style>
 
 #app {
-  font-family: "Helvetica", Helvetica Neue;
+  font-family: "Helvetica", "Helvetica Neue";
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -126,25 +177,36 @@ export default {
   margin-top: 3px;
 }
 
+.site-branding {
+    margin-top: 1em;
+}
+
+
 .site-title, .site-title a {
 	clear: both;
-	margin-top: 0;
-	margin-bottom: 0;
 	padding-top: 1em;
   color: #54595F;
-  font-family: "Helvetica", Helvetica Neue;
-  font-size: 1em;
+  font-family: "Helvetica", "Helvetica Neue";
+  font-size: 1.6rem;
   line-height: 2em;
   letter-spacing: 0.9px;
   font-weight: bold;
   text-decoration: none;
+  width: 50%;
+  display: inline;
 }
 
 .site-title a:hover {
     color: rgba(170, 66, 66, 0.22);
 }
 
+.site-title.left {
+    padding-right: 15%;
+}
 
+.site-title.right {
+    padding-left: 15%;
+}
 
 
 
@@ -178,6 +240,11 @@ aside.hide {
 
 aside > div {
   padding-left: 1.5em;
+}
+
+aside div div{
+  text-align: left;
+  margin: 0 0 0.5em 0;
 }
 
 #painting {
@@ -224,6 +291,26 @@ aside label {
 header p {
   padding: 0 4em 0 4em;
   margin-top: 1em;
+}
+
+@media only screen and (max-width: 768px) {
+
+.site-title, .site-title a {
+    font-size: 1.2rem;
+  }
+
+.site-title.left {
+    padding-right: 0%;
+  }
+
+}
+
+.server-message {
+  display: block;
+  font-size: 0.7em;
+  position: absolute;
+  top: 0.2em;
+  left: 0.01em;
 }
 
 </style>

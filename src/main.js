@@ -5,14 +5,17 @@ import VueKonva from 'vue-konva'
 import vuetify from './plugins/vuetify';
 import VueCookies from 'vue-cookies';
 import vueCountryRegionSelect from 'vue-country-region-select';
-import CountryFlag from 'vue-country-flag'
- 
+import CountryFlag from 'vue-country-flag';
+import AsyncComputed from 'vue-async-computed'
+
+
 Vue.component('country-flag', CountryFlag)
 
 Vue.use(vueCountryRegionSelect)
 Vue.use(VueCookies)
 Vue.use(axios)
 Vue.use(VueKonva)
+Vue.use(AsyncComputed)
 Vue.config.productionTip = false
 
 var host = location.hostname;

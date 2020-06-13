@@ -1,5 +1,5 @@
 <template>
-   <div><span>{{ status }}</span>
+   <div><span>{{ status }}{{ statusSession }}</span>
   <v-stage  ref="stage" :config="configStage">
     <v-layer  ref="layer">
         <v-image @mousedown="handleDown" @touchstart="handleDown" @mousemove="handleMove" @touchmove="handleMove" @mouseup="handleUp" @touchend="handleUp" ref="image" :config="configImage" />
@@ -32,6 +32,9 @@ export default {
       },
       country: {
           type: String
+      },
+      viewer: {
+          type: Boolean
       }
    },
    data() {
@@ -79,23 +82,58 @@ export default {
     }
    },
    computed: {
-        status: function() {
-            if (this.fase == "beforePainting")
-                return "Clik on start ...";
-            else if (this.fase == "hasPainted")
-                return "";
-            else if (this.fase == "painting")
-                return "There are " + this.timer + " seconds left to paint...";
-            else
-                return "";
-        }
+       status: function() {
+             if (this.fase == "beforePainting" && !this.viewer)
+                return "Click button to start ...";
+            else if (this.fase == "painting" && !this.viewer)
+                return "There are " + this.timer + " seconds left for you to paint...";
+            else if (this.fase == "paintingEnded" && this.viewer) {
+               bus.$emit('newPainter', this.username);
+               return "";
+            }
+             else
+                    return "";
+       }
    },
+   /************************************** werkt niet
+   asyncComputed: {
+        statusSession: function() {
+            if (this.fase == "paintingEnded" && this.viewer) {
+                    //iemand anders is klaar met schilderen 
+                    const image = new window.Image();
+                    this.$emit('start-Loading');
+                    //uit de database ophalen
+                    this.axios.get(this.$mongoresturl + 'artget.php')
+                    .then(response => {
+                        //console.log(response);
+                        if (response.data.status == "ok") {
+                            if (response != null) {
+                                image.src = response.data.response.imagedata;
+                                this.latest = response.data.response.imagedata;
+                                this.prevSession.username = response.data.response.username;
+                                this.prevSession.imagecreated = response.data.response.imagecreated;
+                            } 
+                        }
+                        return "...";                
+                    });
+                    image.onload = () => {
+                            //console.log(image);
+                            this.image = image;
+                            var theimg = this.$refs.image.getNode();        
+                            this.context = theimg.getContext('2d');
+                            this.context.drawImage(this.image,0,0,width, height);
+                            this.$emit('stop-Loading');
+                    }               
+            }
+        }
+   }
+   ********************************************/
     created() {
-       const image = new window.Image();
        /********************** 
            De src van het achtergrond plaatje wordt uit de database opgehaald en hier getoond; de nieuwe gebruiker schildert er overheen en de nieuwe 
            versie wordt opgeslagen met de naam van de current gebruiker 
        **************************************************************/
+       const image = new window.Image();
         if (this.latest == null) {
             this.$emit('start-Loading');
             //uit de database ophalen
@@ -110,7 +148,7 @@ export default {
                         this.prevSession.imagecreated = response.data.response.imagecreated;
                     } else {
                         //Eerste sessie
-                        this.$emit('stop-Loading', 'Nog geen opgeslagen afbeeldingen');
+                        this.$emit('stop-Loading', 'No paintings yet');
                     }
                 }
                 else {
@@ -155,7 +193,7 @@ export default {
                         image.src = response.data.response.imagedata;
                     } else {
                         //Eerste sessie
-                        this.$emit('stop-Loading', 'Niet gevonden');
+                        this.$emit('stop-Loading', 'Not found');
                     }
                 }
                 else {
@@ -234,7 +272,7 @@ export default {
                             //console.log(response);
                             bus.$emit('newPainter');
 
-                            this.$emit('stop-Loading', 'Nieuwe schilderij is succesvol opgeslagen');
+                            this.$emit('stop-Loading', 'New painting has been saved');
                         }
                         else {
                             this.errors.push(response.response);
@@ -266,7 +304,7 @@ export default {
                                          this.savePaintingAlt();
                                          this.sessionStarted = false;
                                          this.isPaint = false;
-                                         this.fase = 'hasPainted';
+                                         this.fase = 'paintingEnded';
                                          this.setCookie();                                      
                                      }, this.timer * 1000);
                 }
