@@ -152,14 +152,14 @@ export default {
                     }
                 }
                 else {
-                    this.errors.push(response.response);
+                    //this.errors.push(response.response);
                     this.$emit('stop-Loading', response.response);
 
                 }
             })
             .catch(error => {
                 this.errors.push("Server could not process " + error);
-                this.$emit('stop-Loading', error);
+                this.$emit('stop-Loading');
             });
         }
         else {
@@ -263,7 +263,7 @@ export default {
 
                 this.axios.post(this.$mongoresturl + 'artsave.php', querystring.stringify({
                         username : this.username,
-                        country: this.country,
+                        country: this.country == "" ? "NL" : this.country,
                         imagedata : dataURL
                     }))
                     .then(response => {

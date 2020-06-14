@@ -6,7 +6,7 @@
     <country-flag :country='painter.country' size='small' /><span class="timecreated">{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
      {{ painter.username }}</button> 
     </li></ul>
-    <span v-if="painters.length == 0">Nobody has started painting</span>
+    <span v-if="painters.length == 0">Nobody has started painting yet</span>
 </div>
 </template>
 
@@ -22,12 +22,20 @@ export default {
     return {
       painters: null,
       errors: [],
-      activePainter: null
+      activePainter: null,
+      lastPainterName: ""
     }
   },
   props: {
       fase: {
           type: String
+      }
+  },
+  watch: { 
+      fase: function(newVal, oldVal) { // watch it
+          if (newVal == "painting" && oldVal == "beforePainting") {
+            bus.$emit('changePainting', this.lastPainterName);
+          }
       }
   },
   computed: {
@@ -53,13 +61,13 @@ export default {
                 if (response.data.status == "ok") {
                     if (response != null) {
                         this.painters = response.data.response;
+                        this.lastPainterName = this.painters[this.painters.length - 1].username;
                     } else {
                         this.info = response.status;
                     }
                 }
                 else {
                     this.errors.push(response.response);
-
                 }
             })
             .catch(error => {
@@ -128,8 +136,6 @@ export default {
 header #painters.open {
     display: block;
 }
-
-
 
 header #painters {
    margin: .1em;

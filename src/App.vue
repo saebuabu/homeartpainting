@@ -132,13 +132,17 @@ export default {
             //console.log("kleur: "+value);
         },
         startDrawing() {
+          
+          this.username = this.username.trim();
           this.viewer = false;
-          if (this.username.length > 2 && this.country.length > 0) {
+          //check op country werkt op de een of andere manier niet
+          if (this.username.length > 2) {
+            this.country = (this.country == "" || !this.country) ? "NL" : this.country;
             this.fase = 'painting';
             socket.emit("painterPainting", this.username );
           }
           else  {
-              alert("Please fill in your name and country");
+              alert("Please fill in your name");
           }
         },
         startSession() {
@@ -294,6 +298,11 @@ header p {
 }
 
 @media only screen and (max-width: 768px) {
+
+aside.active {
+    left: 6%;
+    width: 85vw;
+}
 
 .site-title, .site-title a {
     font-size: 1.2rem;
