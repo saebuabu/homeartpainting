@@ -133,10 +133,10 @@ export default {
         },
         startDrawing() {
           
-          this.username = this.username.trim();
+          this.username = this.username.trimRight();
           this.viewer = false;
           //check op country werkt op de een of andere manier niet
-          if (this.username.length > 2) {
+          if (this.username.length > 3) {
             this.country = (this.country == "" || !this.country) ? "NL" : this.country;
             this.fase = 'painting';
             socket.emit("painterPainting", this.username );

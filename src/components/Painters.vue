@@ -47,13 +47,13 @@ export default {
           console.log("ververs painters...");
 
           if (username) 
-                    bus.$emit('changePainting', username);
-
-          this.laadPainters()
+            this.laadPainters(username)
+          else          
+            this.laadPainters()
         }); 
   },
   methods: {
-    laadPainters() {
+    laadPainters(u) {
        console.log("Painters laden...");
         this.axios.get(this.$mongoresturl + 'artists.php')
             .then(response => {
@@ -61,7 +61,11 @@ export default {
                 if (response.data.status == "ok") {
                     if (response != null) {
                         this.painters = response.data.response;
-                        this.lastPainterName = this.painters[this.painters.length - 1].username;
+                        if (this.painters.length > 0) {
+                          this.lastPainterName = this.painters[this.painters.length - 1].username;
+                          if (u)
+                            this.$emit('changePainting', u);
+                        }
                     } else {
                         this.info = response.status;
                     }
