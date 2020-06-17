@@ -1,7 +1,7 @@
 <template>
 <div id="painters">
     <h3>ONLINE CANVAS</h3>
-    <h4 >artists</h4>
+    <a href="#artists" id="artists">artists</a>&nbsp;<a id="close" href="#close">&lt;&lt;</a>
     <ul class="painters-wrapper" v-if="painters.length > 0"> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
     <country-flag :country='painter.country' size='small' /><span class="timecreated">{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
      {{ painter.username }}</button> 
@@ -89,8 +89,62 @@ export default {
 }
 </script>
 <style scoped>
+
+ ul.painters-wrapper {
+    height:0;
+    padding:0 15px 0 0;
+    overflow:hidden;
+    -webkit-transition:height .4s ease-out, padding .4s ease-out;
+    -moz-transition:height .4s ease-out, padding .4s ease-out;
+    -o-transition:height .4s ease-out, padding .4s ease-out;
+    -ms-transition:height .4s ease-out, padding .4s ease-out;
+    transition:height .4s ease-out, padding .4s ease-out;
+  }
+
+a#artists, a#close {
+  font-weight: bold;
+  margin-bottom: 0.4em;
+  color: #000;
+}
+
+a#close {
+  display: none;
+}
+a#artists:target + a#close {
+   display: inline;
+}
+
+a#artists:visited, a#close {
+    text-decoration: none;
+}
+
+a#artists:active {
+    background: -webkit-gradient(
+      linear, 0 0, 0 100%,
+      from(#ccc), to(#ddd)
+    );
+    background:-moz-linear-gradient(#ccc, #ddd);
+    background:-o-linear-gradient(#ccc, #ddd);
+    background:-ms-linear-gradient(#ccc, #ddd);
+    background:linear-gradient(#ccc, #ddd);
+    color:#000;
+  }
+
+#artists:target + a + ul {
+    height: 25vh;
+    overflow: auto;
+}
+
+#close:target + ul {
+    height: 0;
+}
+
+#artists + ul {
+    height: 0vh;
+}
+
 #painters {
-   margin: 0.5em 4em 0.5em 4em;
+   margin: 0.5em 4em 0.2em 4em;
 }
 #painters h3 {
    margin-bottom: 0.5em;
@@ -122,6 +176,9 @@ export default {
   padding: 0;
 }
 
+
+
+/* hieronder de styling voor mobiel/portrait */
 @media only screen and (max-width: 768px) {
 
   .painters-wrapper {
