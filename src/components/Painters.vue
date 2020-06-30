@@ -1,7 +1,7 @@
 <template>
 <div id="painters">
     <h3>ONLINE CANVAS</h3>
-    <a href="#artists" id="artists">artists</a>&nbsp;<a id="close" href="#close">&lt;&lt;</a>
+    <a href="#artists" id="artists">artists</a>&nbsp;<a id="close" href="#close">&gt;&gt;</a>
     <ul class="painters-wrapper" v-if="painters.length > 0"> <li class="painters" v-for="(painter, index) in painters" :key="painter.username">
     <country-flag :country='painter.country' size='small' /><span class="timecreated">{{ painter.imagecreated}}</span><button :class="{ active: activePainter === painter.username }" v-on:click="showPainterPainting(index)">
      {{ painter.username }}</button> 
@@ -91,7 +91,6 @@ export default {
 <style scoped>
 
  ul.painters-wrapper {
-    height:0;
     padding:0 15px 0 0;
     overflow:hidden;
     -webkit-transition:height .4s ease-out, padding .4s ease-out;
@@ -131,16 +130,16 @@ a#artists:active {
   }
 
 #artists:target + a + ul {
-    height: 25vh;
+    height: 0;
     overflow: auto;
 }
 
 #close:target + ul {
-    height: 0;
+    height: 45vh;
 }
 
 #artists + ul {
-    height: 0vh;
+    height: 0;
 }
 
 #painters {

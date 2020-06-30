@@ -7,10 +7,12 @@ import VueCookies from 'vue-cookies';
 import vueCountryRegionSelect from 'vue-country-region-select';
 import CountryFlag from 'vue-country-flag';
 import AsyncComputed from 'vue-async-computed'
+import VueMeta from 'vue-meta'
 
 
 Vue.component('country-flag', CountryFlag)
 
+Vue.use(VueMeta)
 Vue.use(vueCountryRegionSelect)
 Vue.use(VueCookies)
 Vue.use(axios)
@@ -34,5 +36,6 @@ new Vue({
   axios,
   VueCookies,
   vueCountryRegionSelect,
+  VueMeta,
   render: h => h(App)
 }).$mount('#app')

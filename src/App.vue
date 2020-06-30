@@ -56,6 +56,15 @@ const socket = socketio('//artsocketpainting.herokuapp.com', options);
 
 export default {
   name: 'App',
+  metaInfo() {
+        return {
+          title: "Online Canvas by Emmy Zwagers and Abu Saebu",
+          meta: [ { name: 'description', 
+                    content:  'Collaborating with other painters on a online canvas'},
+                    { name: 'keywords', content: 'painting, canvas, art, social, sharing, collaborate' }
+                ]
+        }
+  },
   components: {
     DrawArt,
     Colorpicker,
